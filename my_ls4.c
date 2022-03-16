@@ -1,5 +1,6 @@
 #include<string.h>
 #include<stdio.h>
+#include<stdlib.h>
 #include<sys/types.h>
 #include<dirent.h>
 #include<sys/stat.h>
@@ -10,15 +11,29 @@ void do_ls1(char[]);// -l
 void do_ls2(char[]);// -a
 void do_ls3(char[]);// ls
 void do_ls4(char[]);// ls
+void do_ls5(char[]);// ls -i
+void do_ls6(char[]);// ls -ial
 void dostat(char*);
 void show_file_info(char*,struct stat*);
 void mode_to_letters(int ,char[]);
 char*uid_to_name(uid_t);
 char*gid_to_name(gid_t);
 void match(int argc,char*argv[]);
+void restored_ls(struct dirent*);
+void error_handle(const char*);
+//字典序
+void swap(char** s1,char** s2);
+int compare(char* s1,char* s2);
+int partition(char** filenames,int start,int end);
+void sort(char** filenames,int start,int end);
 int has_a=0;
 int has_l=0;
 int has_al=0;
+int has_i=0;
+int has_ial=0;
+//存放数组名的数组
+char *filenames[4096];		
+int file_cnt = 0;			//目录中文件个数
 int main(int argc,char* argv[])
 {
    match(argc,argv);
@@ -39,6 +54,14 @@ int main(int argc,char* argv[])
         do_ls(".");
       }
       else if(has_al==1)
+      {
+        do_ls4(".");
+      }
+      else if(has_i==1&&has_a!=1&&has_l!=1&&has_al!=1)
+      {
+        do_ls5(".");
+      }
+      else if(has_ial==1)
       {
         do_ls4(".");
       }
@@ -110,22 +133,30 @@ void do_ls2(char dirname[])
   }
   else                                   //打开成功
   {
-     while((direntp=readdir(dir_ptr))!=NULL)  
-      {
-        if(direntp->d_name[0]!='.')
-         { 
-            printf("%-22s",direntp->d_name);    
+      
+           //读取目录并显示信息
+		//将文件名存入数组
+		while((direntp = readdir(dir_ptr)))
+    {
+			restored_ls(direntp);
+    }
+    sort(filenames,0,file_cnt-1);
+    int j = 0;
+		for(j = 0;j < file_cnt;++j)
+    {
+            printf("%-22s",filenames[j]);    
             i++;
             if(i==4)
             {
               printf("\n");
               i=0;
             }
-         }
+     }
       }
      printf("\n");
     closedir(dir_ptr);
-  }
+     
+  
 }
 void do_ls3(char dirname[])
 {
@@ -148,11 +179,46 @@ void do_ls3(char dirname[])
                printf("\n");
                i=0;
              }
+
      }
   printf("\n");
     closedir(dir_ptr);
   
   }
+}
+
+void do_ls5(char dirname[])
+{
+  int i=0;
+  DIR*dir_ptr;
+  struct dirent*direntp;
+  if((dir_ptr=opendir(dirname))==NULL)
+    fprintf(stderr,"ls1:cannot open %s\n",dirname);
+  else 
+  {
+    while((direntp=readdir(dir_ptr))!=NULL)
+    {
+      if(direntp->d_name[0]!='.')
+      {
+        struct stat info;
+        if(stat(direntp->d_name,&info)==-1)
+          perror(direntp->d_name);
+        else 
+        {
+          printf("%d   %-22s",info.st_ino,direntp->d_name);
+          i++;
+          if(i==4)
+          {
+            printf("\n");
+            i=0;
+          }
+        }
+      }
+    }
+  }
+  closedir(dir_ptr);
+  printf("\n");
+
 }
 void dostat(char*filename)
 {
@@ -168,12 +234,14 @@ void show_file_info(char*filename,struct stat*info_p)
   void mode_to_letters();
   char modestr[11];
   mode_to_letters(info_p->st_mode,modestr);
+  if(has_ial==1)
+  printf("%ul ",info_p->st_ino);
   printf("%s ",modestr);
   printf("%4d ",(int)info_p->st_nlink);
   printf("%-8s ",uid_to_name(info_p->st_uid));
   printf("%-8s ",gid_to_name(info_p->st_gid));
   printf("%8ld ",(long)info_p->st_size);
-  printf("%.12s ",4+ctime(&info_p->st_size));
+  printf("%.12s ",4+ctime(&info_p->st_ctim));
   printf("%s\n",filename);
 }
 void mode_to_letters(int mode,char str[])
@@ -233,6 +301,66 @@ void match(int argc,char*argv[])
     if(strcmp(argv[i],"-l")==0)
       has_l=1;
     if(strcmp(argv[i],"-al")==0||strcmp(argv[i],"-la")==0||(has_a==1&&has_l==1))
-     has_al=1; 
+    {
+     has_al=1;
+    }
+    if(strcmp(argv[i],"-i")==0)
+      has_i=1;
+    if(strcmp(argv[i],"-ail")==0||strcmp(argv[i],"-ial")==0||strcmp(argv[i],"-lia")==0||strcmp(argv[i],"-ali")==0||strcmp(argv[i],"ila")==0||strcmp(argv[i],"lai")==0||(has_a==1&&has_l==1&&has_i==1))
+    {
+      has_ial=1;
+    }
   }
 }
+//交换两字符串
+void swap(char** s1,char** s2)
+{
+	char* tmp = *s1;
+	*s1 = *s2;
+	*s2 = tmp;
+}
+
+//比较两字符串的字典序
+//s1靠前，返回负数，s1靠后，返回正数
+//s1和s2完全一样，返回0
+int compare(char* s1,char* s2){
+	while(*s1 && *s2 && *s1 == *s2){
+		++s1;
+		++s2;
+	}
+	return *s1 - *s2;
+}
+
+int partition(char** filenames,int start,int end){
+	if(!filenames)	return -1;
+	char* privot = filenames[start];
+	while(start < end){
+		while(start < end && compare(privot,filenames[end]) < 0)
+			--end;
+		swap(&filenames[start],&filenames[end]);
+		while(start < end && compare(privot,filenames[start]) >= 0)
+			++start;
+		swap(&filenames[start],&filenames[end]);
+	}
+	return start;
+}
+
+void sort(char** filenames,int start,int end){
+	if(start < end){
+		int position = partition(filenames,start,end);
+		sort(filenames,start,position - 1);
+		sort(filenames,position + 1,end);
+	}
+}
+void restored_ls(struct dirent* cur_item){
+	char* result = cur_item->d_name;
+	//当不带-a参数时，隐藏以'.'开头的文件
+	if(!has_a && *result == '.')	return;
+	filenames[file_cnt++] = cur_item->d_name;
+}
+
+void error_handle(const char* dir_name){
+	perror(dir_name);
+	exit(1);
+}
+
