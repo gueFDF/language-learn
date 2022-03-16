@@ -13,8 +13,6 @@ void do_ls3(char[]);// ls
 void do_ls4(char[]);// ls
 void do_ls5(char[]);// ls -i
 void do_ls6(char[]);// ls -ial
-void do_ls7(char[]);// ls -il
-void do_ls8(char[]);// ls -ai 
 void dostat(char*);
 void show_file_info(char*,struct stat*);
 void mode_to_letters(int ,char[]);
