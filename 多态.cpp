@@ -3,7 +3,7 @@ using namespace std;
 class Animal
 {
 public:
-    virtual void speak()
+     void speak()
     {
         cout<<"动物在说话"<<endl;
     }
