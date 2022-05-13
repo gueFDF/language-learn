@@ -4,7 +4,7 @@ using namespace std;
 class Calculator
 {
 public:
-    virtual int getResult()=0;
+    virtual int getResult()=0;  //纯虚函数，子类必须重写
     int m_num1;
     int m_num2;
 };

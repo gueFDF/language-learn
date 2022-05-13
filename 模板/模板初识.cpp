@@ -1,5 +1,9 @@
 #include<iostream>
 using namespace std;
+void myswap(int &a,int &b)
+{
+    cout<<"骗你的，调错函数了"<<endl;
+}
 template<typename T>
 void myswap(T &a,T &b)
 {
@@ -8,11 +12,12 @@ void myswap(T &a,T &b)
     a=b;
     b=temp;
 }
+
 int main()
 {
     int a=1;
     int b=2;
-    myswap<int>(a,b);
+    myswap(a,b);
     cout<<a<<endl;
     cout<<b<<endl;
     return 0;
