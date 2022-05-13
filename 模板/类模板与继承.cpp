@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 using namespace std;
-// template <class T>
+template <class T>
 class father
 {
 public:
-    father(int A, int B)
+    father(T A, T B)
         : a(A), b(B)
     {
         cout << "1";
@@ -16,27 +16,27 @@ public:
    }
 
 
-    int a;
-    int b;
+    T a;
+    T b;
 };
-// template <class T>
-class Son : public father
+template <class T>
+class Son : public father<T>
 {
 public:
-    Son(int _m, int n, int k)
+    Son(T _m, T n, T k)
         : m(_m)
-        , father(n, k)
+        , father<T>(n, k)
     {
         cout << "Son" << endl;
-       father:: b=100;
+        father<T>::b=110;
     }
 
 private:
-    int m;
+    T m;
 };
 int main()
 {
-    Son p(100, 200, 100);
+    Son<int>p(100, 200, 100);
     p.showperson();
     // p.a = 100;
     // p.b = 200;
