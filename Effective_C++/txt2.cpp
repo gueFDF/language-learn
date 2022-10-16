@@ -166,65 +166,236 @@
 // 	return 0;
 // }
 
-#include <iostream>
-#include<memory>
-using namespace std;
-class base
-{
-public: virtual ~base()
-		{
- 
-		}
-		virtual void print()
-		{
-			cout<<"we are in base"<<endl;
-		}
-protected:
-private:
-};
-class derived : public base
+// #include <iostream>
+// #include<memory>
+// using namespace std;
+// class base
+// {
+// public: virtual ~base()
+// 		{
+
+// 		}
+// 		virtual void print()
+// 		{
+// 			cout<<"we are in base"<<endl;
+// 		}
+// protected:
+// private:
+// };
+// class derived : public base
+// {
+// public:
+// 	void  print()
+// 	{
+// 		cout <<"we are in derived"<<endl;
+// 	}
+// protected:
+// private:
+// };
+// void func(shared_ptr<base>pre)
+// {
+// 	std::cout<<pre.use_count()<<std::endl;
+// }
+// int main()
+// {
+// 	// base *base_ptr1 = new base;
+// 	// derived *derived_ptr1 =  static_cast<derived*>(base_ptr1);   //base_ptr1实际指向base，不能转化为derived
+// 	// base *base_ptr2 = new derived;
+// 	// derived *derived_ptr2 = static_cast<derived*>(base_ptr2);   //base_ptr1实际指向derived，不能转化为derived
+// 	shared_ptr<base> ptr(new base);
+// 	std::cout<<ptr.use_count()<<std::endl;
+// 	func(ptr);
+// 	std::cout<<ptr.use_count()<<std::endl;
+// 	//derived *derived_ptr2 = new derived;
+// 	//base *base_ptr2 = dynamic_cast<base*>(derived_ptr2);
+// 	// if (derived_ptr1 == NULL)
+// 	// {
+// 	// 	cout <<"base pointer pointed to base can be dynamic_cast to derived pointer  is wrong"<<endl;
+// 	// }
+// 	// else
+// 	// {
+// 	// 	cout<<"pointer to base can be dynamic_cast to derived pointer  is success"<<endl;
+// 	// }
+
+// 	// if (derived_ptr2 == NULL)
+// 	// {
+// 	// 	cout <<"base pointer pointed to derived can be dynamic_cast to derived pointer  is wrong"<<endl;
+// 	// }
+// 	// else
+// 	// {
+// 	// 	cout<<"base pointer pointed to derived can be dynamic_cast to derived pointer  is success"<<endl;
+// 	// }
+// 	return 0;
+// }
+
+// #include <iostream>
+// class base
+// {
+// public:
+// 	virtual void f1()
+// 	{
+// 		std::cout << "base f1()" << std::endl;
+// 	}
+// 	virtual void f1(int a)
+// 	{
+// 		std::cout << "base f1(int)" << std::endl;
+// 	}
+// 	virtual void f3()=0;//纯虚函数
+// };
+
+// void base::f3()
+// {
+
+// }
+
+// class derived : public base
+// {
+// public:
+// 	using base::f1;
+// 	void f1()
+// 	{
+// 		std::cout << "derived f1()" << std::endl;
+// 	}
+// 	void f3()
+// 	{}
+// };
+// int main()
+// {
+// 	derived p;
+// 	p.f1();
+// 	// p.f1(3); //错误，子类将父类的重名函数覆盖了
+
+// 	//可以使用using
+// 	p.f1(1);
+// 	return 0;
+// }
+
+// #include <iostream>
+// class Person
+// {
+// public:
+// 	void S()
+// 	{
+// 		speak();
+// 	}
+
+// private:
+// 	virtual void speak()
+// 	{
+// 		std::cout << "我是人" << std::endl;
+// 	}
+// };
+
+// class student:public Person
+// {
+// private:
+// 	void speak()
+// 	{
+// 		std::cout << "我是学生" << std::endl;
+// 	}
+// };
+
+// int main()
+// {
+// 	student a;
+// 	a.S();
+// }
+
+// #include <iostream>
+// using namespace std;
+// class A
+// {
+// public:
+// 	int m_age;
+// };
+// class B : virtual public A
+// {
+// public:
+// 	void print()
+// 	{
+// 		cout << "B" << endl;
+// 	}
+// };
+// class C : virtual public A
+// {
+// 	void print()
+// 	{
+// 		cout << "C" << endl;
+// 	}
+// };
+// class D : virtual public B,virtual  public C
+// {
+// };
+// int main()
+// {
+// 	D a;
+// 	a.B::m_age = 2;
+// 	a.A::m_age = 1;
+// 	// a.C::m_age = 3;
+// 	cout << a.B::m_age << endl;
+// 	cout << a.m_age << endl;
+// 	a.print();
+// }
+
+// #include <iostream>
+
+// template <typename C>
+// void print2nd(const C &container)
+// {
+// 	if (container.size() >= 2)
+// 	{
+// 		typename C::const_iterator iter(container.begin());
+// 		container.const_iterator iter(container.begin());
+// 	}
+// }
+
+// int main()
+// {
+// 	return 0;
+// }
+
+// #include <iostream>
+// template<class T>
+// class Add
+// {
+// public:
+// 	const T operator()(const T &a, const T &b)
+// 	{
+// 		return a + b;
+// 	}
+// };
+
+// int main()
+// {
+// 	Add<float> add;
+// 	std::cout << add(1.3333333,2) << std::endl;
+// }
+#include<iostream>
+template<typename T>
+class Rational
 {
 public:
-	void  print()
-	{
-		cout <<"we are in derived"<<endl;
-	}
-protected:
-private:
+	Rational(const T&a=0,const T&b=1) :numberator(a),denominator(b){}
+	friend const Rational<T> operator*(const Rational<T>&lhs,const Rational<T>&rhs);
+	T numberator;
+	T denominator;
 };
-void func(shared_ptr<base>pre)
+
+template<typename T>
+const Rational<T> operator*(const Rational<T>&lhs,const Rational<T>&rhs)
 {
-	std::cout<<pre.use_count()<<std::endl;
-}
-int main()
-{
-	// base *base_ptr1 = new base;
-	// derived *derived_ptr1 =  static_cast<derived*>(base_ptr1);   //base_ptr1实际指向base，不能转化为derived
-	// base *base_ptr2 = new derived;
-	// derived *derived_ptr2 = static_cast<derived*>(base_ptr2);   //base_ptr1实际指向derived，不能转化为derived
-	shared_ptr<base> ptr(new base);
-	std::cout<<ptr.use_count()<<std::endl;
-	func(ptr);
-	std::cout<<ptr.use_count()<<std::endl;
-	//derived *derived_ptr2 = new derived;
-	//base *base_ptr2 = dynamic_cast<base*>(derived_ptr2);
-	// if (derived_ptr1 == NULL)
-	// {
-	// 	cout <<"base pointer pointed to base can be dynamic_cast to derived pointer  is wrong"<<endl;
-	// } 
-	// else
-	// {
-	// 	cout<<"pointer to base can be dynamic_cast to derived pointer  is success"<<endl;
-	// }
-    
-	// if (derived_ptr2 == NULL)
-	// {
-	// 	cout <<"base pointer pointed to derived can be dynamic_cast to derived pointer  is wrong"<<endl;
-	// } 
-	// else
-	// {
-	// 	cout<<"base pointer pointed to derived can be dynamic_cast to derived pointer  is success"<<endl;
-	// }
-	return 0;
+	Rational<T> dst(lhs.numberator*rhs.numberator,lhs.denominator*rhs.denominator);
+	return dst;
 }
 
+
+int main()
+{
+	Rational<int> a(5,6);
+	Rational<int> b(7,8);
+	//Rational<int>c=a*b;
+	Rational<int>d=a*2;//无法连接
+
+	std::cout<<d.numberator<<"    "<<d.denominator<<std::endl;  
+	return 0;
+}
