@@ -370,32 +370,35 @@
 // 	Add<float> add;
 // 	std::cout << add(1.3333333,2) << std::endl;
 // }
-#include<iostream>
-template<typename T>
+#include <iostream>
+template <typename T>
 class Rational
 {
 public:
-	Rational(const T&a=0,const T&b=1) :numberator(a),denominator(b){}
-	friend const Rational<T> operator*(const Rational<T>&lhs,const Rational<T>&rhs);
+	Rational(const T &a = 0, const T &b = 1) : numberator(a), denominator(b) {}
+	friend const Rational<T> operator*(const Rational<T> &lhs, const Rational<T> &rhs)
+	{
+		Rational<T> dst(lhs.numberator * rhs.numberator, lhs.denominator * rhs.denominator);
+		return dst;
+	}
 	T numberator;
 	T denominator;
 };
 
-template<typename T>
-const Rational<T> operator*(const Rational<T>&lhs,const Rational<T>&rhs)
-{
-	Rational<T> dst(lhs.numberator*rhs.numberator,lhs.denominator*rhs.denominator);
-	return dst;
-}
-
+//template <typename T>
+// const Rational<T> operator*(const Rational<T> &lhs, const Rational<T> &rhs)
+// {
+// 	Rational<T> dst(lhs.numberator * rhs.numberator, lhs.denominator * rhs.denominator);
+// 	return dst;
+// }
 
 int main()
 {
-	Rational<int> a(5,6);
-	Rational<int> b(7,8);
-	//Rational<int>c=a*b;
-	Rational<int>d=a*2;//无法连接
+	Rational<int> a(5, 6);
+	Rational<int> b(7, 8);
+	// Rational<int>c=a*b;
+	Rational<int> d = a * 2*b; 
 
-	std::cout<<d.numberator<<"    "<<d.denominator<<std::endl;  
+	std::cout << d.numberator << "    " << d.denominator << std::endl;
 	return 0;
 }
